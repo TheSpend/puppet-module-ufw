@@ -60,7 +60,7 @@ define ufw::allow($proto="any", $port="any", $to="any", $from="any") {
     "any"   => "",
     default => $from,
   }
-  $match_from = "${match_from_to}${match_from_port}${match_from_proto}"
+  $match_from = "${match_from_from}${match_from_port}${match_from_proto}"
 
   $match_line = "${match_to} +ALLOW +${match_from}"
   
