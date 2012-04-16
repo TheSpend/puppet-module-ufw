@@ -1,5 +1,9 @@
 define ufw::allow($proto="any", $port="any", $to="any", $from="any") {
 
+  ######################################################
+  # "ufw status" rules matching
+  ######################################################
+
   # Special case: if you allow from any to any with
   # a proto, you'll get this. We shouldn't have this
   # rule, though
