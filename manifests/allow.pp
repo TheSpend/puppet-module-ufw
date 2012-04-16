@@ -30,39 +30,62 @@ define ufw::allow($proto="any", $port="any", $to="any", $from="any") {
     "any"   => "",
     default => " *${port}",
   }
-  $match_to_to = $to ? {
-    "any"   => "Anywhere",
-    default => $to,
-  }
-  $match_to = "${match_to_to}${match_to_port}${match_to_proto}"
-
-  #Anywhere                   ALLOW       Anywhere
-  #Anywhere                   ALLOW       12345
-  #Anywhere                   ALLOW       12345/tcp
-  #192.168.1.1/tcp            ALLOW       Anywhere
-  #Anywhere                   ALLOW       192.168.1.2
-  #Anywhere                   ALLOW       192.168.1.2 12345
-  #Anywhere                   ALLOW       192.168.1.2 12345/tcp
-  #Anywhere                   ALLOW       192.168.1.2/tcp
-  if ( $from == "any" ) and ( $port == "any" ) {
-    $match_from_proto = ""
+  if ( $port == "any" ) {
+    $match_to = $to ? {
+      "any"   => "Anywhere",
+      default => $to,
+    }
   } else {
-    $match_from_proto = $proto ? {
+    $match_to = $to ? {
       "any"   => "",
-      default => "/${proto}",
+      default => $to,
     }
   }
-  $match_from_port = $port ? {
-    "any"   => "",
-    default => " *${port}",
+  $match_to_regex = "${match_to}${match_to_port}${match_to_proto}"
+
+  #FIXME - bring back if from_port implemented
+  ##Anywhere                   ALLOW       Anywhere
+  ##Anywhere                   ALLOW       12345
+  ##Anywhere                   ALLOW       12345/tcp
+  ##192.168.1.1/tcp            ALLOW       Anywhere
+  ##Anywhere                   ALLOW       192.168.1.2
+  ##Anywhere                   ALLOW       192.168.1.2 12345
+  ##Anywhere                   ALLOW       192.168.1.2 12345/tcp
+  ##Anywhere                   ALLOW       192.168.1.2/tcp
+  #if ( $from == "any" ) and ( $port == "any" ) {
+  #  $match_from_proto = ""
+  #} else {
+  #  $match_from_proto = $proto ? {
+  #    "any"   => "",
+  #    default => "/${proto}",
+  #  }
+  #}
+  #$match_from_port = $port ? {
+  #  "any"   => "",
+  #  default => " *${port}",
+  #}
+  #$match_from = $from ? {
+  #  "any"   => "Anywhere",
+  #  default => $from,
+  #}
+  #$match_from_regex = "${match_from}${match_from_port}${match_from_proto}"
+
+  #Anywhere                   ALLOW       Anywhere
+  #192.168.1.1/tcp            ALLOW       Anywhere
+  #Anywhere                   ALLOW       192.168.1.2
+  #Anywhere                   ALLOW       192.168.1.2/tcp
+  if ( $proto == "any" ) or ( $from == "any" ) {
+    $match_from_proto = ""
+  } else {
+    $match_from_proto = "/${proto}"
   }
-  $match_from_from = $from ? {
-    "any"   => "",
+  $match_from = $from ? {
+    "any"   => "Anywhere",
     default => $from,
   }
-  $match_from = "${match_from_from}${match_from_port}${match_from_proto}"
+  $match_from_regex = "${match_from}${match_from_port}${match_from_proto}"
 
-  $match_line = "${match_to} +ALLOW +${match_from}"
+  $match_line = "${match_to_regex} +ALLOW +${match_from_regex}"
   
   notify { $match_line:;}
 
