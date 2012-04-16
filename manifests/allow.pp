@@ -63,6 +63,8 @@ define ufw::allow($proto="any", $port="any", $to="any", $from="any") {
   $match_from = "${match_from_to}${match_from_port}${match_from_proto}"
 
   $match_line = "${match_to} +ALLOW +${match_from}"
+  
+  notify { $match_line;}
 
   exec { "ufw-allow-$proto-from-$from-to-$to-port-$port":
     command => $port ? {
